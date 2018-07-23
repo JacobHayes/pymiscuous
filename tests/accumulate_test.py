@@ -57,3 +57,13 @@ def gen_classes(attr, *values):
 def test_accumulate(msg, call, expected):
     cls, attr = call(accumulate)
     assert getattr(cls, attr) == expected, msg
+
+
+def test_accumulate_instance_override():
+    class Test:
+        x = accumulate([1, 2])
+
+    test = Test()
+    test.x = 1
+    assert Test.x == [1, 2]
+    assert test.x == 1

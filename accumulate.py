@@ -20,14 +20,16 @@ class Accumulate:
             self.constructor = partial(self.constructor, values.default_factory)
         self.is_mapping = isinstance(values, Mapping)
         self.name = None
-        self.overridden = False
         self.values = values
 
     def __get__(self, obj, type_):
-        if self.overridden:
-            return self.values
+        if type_ is None:
+            type_ = type(obj)
         if self.name is None:
             self._infer_name(type_)
+        # Prefer object local values from __set__
+        if obj is not None and self.name in obj.__dict__:
+            return obj.__dict__[self.name]
         collection = (
             iterable
             for iterable in chain(
@@ -42,8 +44,9 @@ class Accumulate:
         return self.constructor(chain.from_iterable(collection))
 
     def __set__(self, obj, values):
-        self.values = values
-        self.overridden = True
+        if self.name is None:
+            self._infer_name(type(obj))
+        obj.__dict__[self.name] = values
 
     def __set_name__(self, type_, name):
         """ Set the field name during class initialization on py3.6+. See `_infer_name` for cases where this is not
