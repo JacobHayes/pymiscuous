@@ -1,0 +1,14 @@
+[tool.poetry]
+authors = ["Jacob Hayes <jacob.r.hayes@gmail.com>"]
+description = "A mapping that returns the key if no value is found."
+license = "MIT"
+name = "mirror-dict"
+readme = "README.md"
+repository = "https://github.com/JacobHayes/pymiscuous/tree/master/mirror-dict"
+version = "1.0.0"
+
+[tool.poetry.dependencies]
+python = "^3"
+
+[tool.poetry.dev-dependencies]
+pytest = "^3.0"
