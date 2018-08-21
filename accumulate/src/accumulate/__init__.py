@@ -1,16 +1,41 @@
 """ Contains helpers to accumulate iterable class attributes.
 """
-from collections import Mapping
+from collections.abc import Mapping
 from functools import partial
 from itertools import chain
 
 
 class Accumulate:
-    """ Implements a descriptor for iterable types that chains the current and parent class values together. Values are
-        only retrieved from immediate parents, but this can be used repeatedly at multiple inheritance levels.
+    """ Inherit iterable class attributes, accumulating values along the way.
 
-        Supports mapping types and returns a mapping with collisions preferring the child-most value. If the mapping is
-        ordered, the result will be ordered, but note that collisions will maintain the original position.
+        Implements a descriptor over iterable types that chains the current and parent
+        class values together. Values are only retrieved from immediate parents, but
+        Accumulate can be used repeatedly at multiple inheritance levels to provide deep
+        retrieval.
+
+        Supports Mapping types (including defaultdict) Top level key collisions prefer
+        the child-most value. If the mapping is ordered, the result will be ordered, but
+        note that collisions will maintain the original position.
+
+        Note: These operations can be considered "shallow" - only top level values are
+        accumulated. For mappings, that means Container *values* will be replaced, not
+        merged.
+
+        >>> class Base:
+        ...     fields = ("id",)
+        ...     metadata = {"filter_fields": ("id",), "read_only_field": ("id",)}
+        ...
+        >>> class User(Base):
+        ...     fields = accumulate(("name", "password"))
+        ...     metadata = accumulate({
+        ...         "filter_fields": ("name",),
+        ...         "invisible_fields": ("password",)
+        ...     })
+        ...
+        >>> User.fields
+        ('name', 'password', 'id')
+        >>> User.metadata
+        {'filter_fields': ('name',), 'read_only_field': ('id',), 'invisible_fields': ('password',)}
     """
 
     def __init__(self, values):
