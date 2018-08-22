@@ -5,7 +5,7 @@ license = "MIT"
 name = "mirror-dict"
 readme = "README.md"
 repository = "https://github.com/JacobHayes/pymiscuous/tree/master/mirror-dict"
-version = "1.0.0"
+version = "1.0.1"
 
 [tool.poetry.dependencies]
 python = "^3"
