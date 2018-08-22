@@ -5,6 +5,11 @@ from collections.abc import Mapping
 
 class MirrorDict(Mapping):
     """ Mapping that returns the key if no value is found.
+
+        >>> snacks = ('cookie', 'biscuit', 'ice cream')
+        >>> synonym = MirrorDict(biscuit='cookie')
+        >>> sorted(set(synonym[snack] for snack in snacks))
+        ['cookie', 'ice cream']
     """
 
     __slots__ = ("_store",)
