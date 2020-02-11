@@ -72,11 +72,11 @@ def demo():
         """
         time.sleep(sleep)
         if msg is None:
-            msg = f"Completed {sleep}!"
+            msg = f"Completed sleeping {sleep} seconds!"
         print(msg)
         # Wouldn't usually publish to the same queue, but let's keep the demo alive (but
         # slowly stopping)!
-        if random.choice([True, False, False]):
+        if random.choice([True, False, False, False]):
             print("Adding another task for fun...")
             publish_message(publisher, sleep=random.randint(1, 5))
 
