@@ -4,11 +4,12 @@ import json
 import random
 import time
 import warnings
+from typing import Optional
 
 from google.api_core.exceptions import AlreadyExists
 from google.cloud import pubsub_v1
 
-import worker
+import pubsub_worker
 
 PROJECT = "<your project>"
 if PROJECT == "<your project>":
@@ -24,6 +25,13 @@ TOPIC, SUBSCRIPTION = (
 warnings.filterwarnings(
     "ignore", "Your application has authenticated using end user credentials"
 )
+
+
+def publish_message(publisher, sleep, msg=None):
+    pubsub_message = {"sleep": sleep}
+    if msg is not None:
+        pubsub_message["msg"] = msg
+    publisher.publish(TOPIC, json.dumps(pubsub_message).encode())
 
 
 def bootstrap_queue(publisher, subscriber):
@@ -46,9 +54,9 @@ def bootstrap_queue(publisher, subscriber):
         "Hit Ctrl-C to gracefully stop the worker at any time - it will wait for any "
         "in-progress jobs to finish!"
     )
-    publisher.publish(TOPIC, json.dumps({"sleep": "0", "msg": helper_msg}).encode())
+    publish_message(publisher, sleep=0, msg=helper_msg)
     for _ in range(500):
-        publisher.publish(TOPIC, json.dumps({"sleep": random.randint(1, 10)}).encode())
+        publish_message(publisher, sleep=random.randint(1, 10))
     print(f"Published some dummy messages!")
 
 
@@ -59,22 +67,20 @@ def demo():
     subscriber = pubsub_v1.SubscriberClient()
     bootstrap_queue(publisher, subscriber)
 
-    def echo(sleep: str, msg: str = None):
+    def echo(sleep: int, msg: Optional[str] = None):
         """ Do lots of work.
         """
-        sleep = int(sleep)
+        time.sleep(sleep)
         if msg is None:
             msg = f"Completed {sleep}!"
-        time.sleep(sleep)
         print(msg)
-        # Wouldn't usually publish to the same queue, but let's keep the demo alive!
-        if random.choice([True, False]):
+        # Wouldn't usually publish to the same queue, but let's keep the demo alive (but
+        # slowly stopping)!
+        if random.choice([True, False, False]):
             print("Adding another task for fun...")
-            publisher.publish(
-                TOPIC, json.dumps({"sleep": random.randint(1, 10)}).encode()
-            )
+            publish_message(publisher, sleep=random.randint(1, 5))
 
-    worker.PubSubWorker(subscriber).run(SUBSCRIPTION, echo)
+    pubsub_worker.PubSubWorker(subscriber).run(SUBSCRIPTION, echo)
 
 
 if __name__ == "__main__":

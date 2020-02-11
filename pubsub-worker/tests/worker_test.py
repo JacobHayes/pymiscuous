@@ -4,7 +4,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from worker import PubSubWorker
+from pubsub_worker import PubSubWorker
 
 
 def test_handlers(dict_encode):
