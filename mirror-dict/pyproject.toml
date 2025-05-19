@@ -1,14 +1,18 @@
-[tool.poetry]
-authors = ["Jacob Hayes <jacob.r.hayes@gmail.com>"]
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = ["pytest"]
+
+[project]
+authors = [{ name = "Jacob Hayes", email = "jrh@jacobhayes.dev" }]
 description = "A mapping that returns the key if no value is found."
 license = "MIT"
 name = "mirror-dict"
 readme = "README.md"
-repository = "https://github.com/JacobHayes/pymiscuous/tree/master/mirror-dict"
-version = "1.0.1"
+requires-python = ">=3"
+version = "1.0.2"
 
-[tool.poetry.dependencies]
-python = "^3"
-
-[tool.poetry.dev-dependencies]
-pytest = "^3.0"
+[project.urls]
+Repository = "https://github.com/JacobHayes/pymiscuous/tree/master/mirror-dict"
